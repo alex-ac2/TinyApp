@@ -9,8 +9,16 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-    <!-- Add EJS code here -->
-    <h1><%= greeting %></h1>
+  <h1>TinyApp</h1>
+  <a href="#">Create New TinyURL</a> 
+  <h3>My URLS </h3>
+  <table style="width:100%">
+      <% for (let element in urls) { %>
+      <tr>
+        <td><%= element %> : <%= urls[element] %></td>
+      </tr> 
+      <% }; %>
+  </table>
 </body>
 
 </html>
