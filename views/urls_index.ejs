@@ -9,8 +9,9 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-  <h1>TinyApp</h1>
-  <a href="#">Create New TinyURL</a> 
+<header>
+  <% include partials/_header %>
+</header>
   <h3>My URLS </h3>
   <table style="width:100%">
       <% for (let element in urls) { %>

@@ -9,8 +9,14 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-    <!-- Add EJS code here -->
-    <h2><%= shortURL %></h2>
+ <header>
+    <% include partials/_header %>
+ </header>
+    <table style="width:100%">
+      <tr>
+        <td><%= shortURL %> : <%= longURL %></td>
+      </tr> 
+  </table>
 </body>
 
 </html>
