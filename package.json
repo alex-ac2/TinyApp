@@ -1,0 +1,22 @@
+{
+  "name": "tinyapp",
+  "version": "1.0.0",
+  "description": "URL shortening application using Express and EJS",
+  "main": "express_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "tinyapp",
+    "shortening",
+    "URL",
+    "EJS"
+  ],
+  "author": "alex-ac2",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.17.1"
+  }
+}
