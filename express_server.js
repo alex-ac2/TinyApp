@@ -96,6 +96,14 @@ app.post("/login", (req, res) => {
   res.redirect("/urls/");
 });
 
+// Logout route
+app.post("/logout", (req, res) => {
+  console.log("Logout user");
+  res.clearCookie('username');
+
+  res.redirect("/urls/");
+});
+
 // Test hello route
 app.get("/hello", (req, res) => {
   let templateVarHello = { greeting: 'Why hello friend' };
