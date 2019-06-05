@@ -1,25 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
-</head>
-<body style="font-size:20px; padding:50px;">
-<header>
-  <% include partials/_header %>
-</header>
-  <h3>My URLS </h3>
-  <table style="width:100%">
-      <% for (let element in urls) { %>
-      <tr>
-        <td><%= element %> : <%= urls[element] %></td>
-      </tr> 
-      <% }; %>
-  </table>
-</body>
+    <title>TinyApp</title>
+  </head>
 
+  <body style="font-size:20px; padding:50px;">
+
+  <% include partials/_header %>
+
+  <h3>My URLS </h3>
+  <table style="width:40%">
+    <!-- <tr>
+      <th>URL</th>
+      <th>Action</th>
+    </tr> -->
+      <% for (let element in urls) { %>
+    <tr>
+      <td><%= element %> : <%= urls[element] %><td>
+      <td>
+        <form method="POST" action="/urls/<%= element %>/delete"> 
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    <% }; %>
+  </table>
+  </body>
 </html>
