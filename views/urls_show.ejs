@@ -14,7 +14,15 @@
  </header>
     <table style="width:100%">
       <tr>
-        <td><%= shortURL %> : <%= longURL %></td>
+        <td><h2>ShortURL: <b><%= shortURL %></b></h2></td>
+      </tr>
+      <tr>
+        <td> 
+          <form method="POST" action="/urls/<%= shortURL %>/update">
+            <input type="text" name="<%= shortURL %>" value="<%= longURL %>">
+            <input type="submit" value="Update">
+          </form>
+        </td>
       </tr> 
   </table>
 </body>
