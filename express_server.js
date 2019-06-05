@@ -12,7 +12,7 @@ let  urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-// Generate random string for URL key
+// Generate and retun random string for URL key
 function generateRandomString() {
   let randomID = Math.random().toString(36).substr(3, 6);
   return randomID;
