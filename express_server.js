@@ -13,7 +13,8 @@ let  urlDatabase = {
 };
 
 function generateRandomString() {
-  
+  let randomID = Math.random().toString(36).substr(3, 6);
+  return randomID;
 }
 
 app.get("/urls", (req, res) => {
@@ -23,7 +24,11 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  let generatedID = generateRandomString();
+  urlDatabase[generatedID] = req.body.longURL;
+  console.log(urlDatabase);
+
+  res.redirect(301,"/urls/" + generatedID);
 });
 
 app.get("/urls/new", (req, res) => {
