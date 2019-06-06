@@ -135,7 +135,7 @@ app.post("/register", (req, res) => {
     res.cookie('user_id', id);
     templateVars.registration = true;
     templateVars.status = 200;
-    res.redirect("/register/");
+    res.redirect("/urls/");
   } else {
     console.log("no user added");
     templateVars.userExists = true;
