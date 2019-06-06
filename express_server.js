@@ -22,12 +22,26 @@ function generateRandomString() {
   return randomID;
 }
 
+// Scan userDB for property value
+function scanUserDB(property, value) {
+  for (key in userDB) {
+    if (userDB[key].property === value) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+}
+
 function checkUserDB(key, value) {
   console.log(key, value);
   let userExists;
+
+  // To-do: edit to include cases(id, password, email)
   Object.keys(userDB).forEach((entry) => {
-    console.log(entry);
-    console.log(userDB[entry][key]);
+    // console.log(entry);
+    // console.log(userDB[entry][key]);
     if (userDB[entry][key] === value) {
       console.log('User exists!');
       userExists = false 
@@ -38,13 +52,17 @@ function checkUserDB(key, value) {
   });
   return userExists;
 }
-
+// test broken
 // URL index - list all shortened URLs
 app.get("/urls", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"],
-    urls: urlDatabase  
+    user: null,
+    urls: urlDatabase
   };
+
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
+  }
 
   res.render("urls_index", templateVars);
 });
@@ -62,9 +80,14 @@ app.post("/urls", (req, res) => {
 // Page to input to shortened URL
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"],
-    urls: urlDatabase  
+    user_id: req.cookies["user_id"],
+    urls: urlDatabase,
+    user: null
   };
+
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
+  }
 
   res.render("urls_new", templateVars);
 });
@@ -72,12 +95,19 @@ app.get("/urls/new", (req, res) => {
 // User registration
 app.get("/register", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    user_id: req.cookies["user_id"],
+    user: null,
     urls: urlDatabase,
     status: undefined,
     registration: false,
-    userExists: undefined
+    userExists: undefined,
+    userObject: userDB
+    //userEmail: userDB[user_id].email
   };
+
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
+  }
 
   res.render("registration", templateVars);
 });
@@ -109,7 +139,8 @@ app.post("/register", (req, res) => {
   } else {
     console.log("no user added");
     templateVars.userExists = true;
-    res.redirect("/register/");
+    res.status(400);
+    res.send("Email already taken");
   }
 });
 
@@ -140,28 +171,65 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   console.log(req.params.shortURL);
   let templateVars = { 
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] 
   };
   res.render("urls_show", templateVars);
 });
 
-// Login route
-app.post("/login", (req, res) => {
-  console.log(req.cookies);
-  if (req.cookies.username === req.body.username) {
-    console.log("Username has been here"); 
-  } else {
-    res.cookie('username', req.body.username);
-    res.status(200);
+// Login page route
+app.get("/login", (req, res) => {
+  let templateVars = { 
+    user_id: req.cookies["user_id"],
+    urls: urlDatabase,  
+    userObject: userDB,
+    user: null
+  };
+   
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
   }
-  res.redirect("/urls/");
+
+  res.render("login", templateVars);
 });
 
-// Logout route
+getUserByEmailPassword = (email, password) => {
+  let user = null;
+  
+  for(let userId in userDB) {
+    console.log('currently processing ', userId)
+    if(userDB[userId].email === email && userDB[userId].password === password) {
+      user = userDB[userId];
+    }
+  }
+
+  return user;
+}
+
+//test
+// Login Post route
+app.post("/login", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400);
+    res.send('Email and password cannot be empty');
+  }
+
+  let user = getUserByEmailPassword(req.body.email, req.body.password);
+
+  if(user) {
+    res.cookie('user_id', user.id)
+    res.redirect("/urls/");
+  } else {
+    res.status(400);
+    res.send("invalid username and/or password");
+  }
+  
+});
+
+// LogOUT route
 app.post("/logout", (req, res) => {
   console.log("Logout user");
-  res.clearCookie('username');
+  res.clearCookie('user_id');
 
   res.redirect("/urls/");
 });

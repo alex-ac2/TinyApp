@@ -3,14 +3,15 @@
 <header>
   <h1>TinyApp</h1>
   <!--  <a href="#">Create new TinyURL</a> -->
-  <% if (!username) { %>
-    <form method="POST" action="/login">
-      <input type="text" name="username" value="user name"><br>
-      <input type="submit" value="Login">
-    </form>
+  <% if (!user) { %>
+  <!-- <form method="POST" action="/login"> -->
+  <!--   <input type="text" name="username" value="user name"><br> -->
+  <!--   <input type="submit" value="Login"> -->
+  <!-- </form> -->
+    <a href="/register">Resgister</a>  |  <a href="/login">Login</a> 
   <% } else { %>
     <div>
-      <p>Logged in as <%= username %>!</p>
+      <p>Logged in as <%= user.email %>!</p>
       <form method="POST" action="/logout"> 
         <button type="submit">Logout</button>
       </form>
