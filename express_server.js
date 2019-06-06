@@ -1,5 +1,5 @@
 const express = require("express");
-const userDB = require("./db/user_db.js");
+const userDB = require("./db/user_db.js").users;
 const app = express();
 const PORT = 8080;
 
@@ -20,6 +20,23 @@ let urlDatabase = {
 function generateRandomString() {
   let randomID = Math.random().toString(36).substr(3, 6);
   return randomID;
+}
+
+function checkUserDB(key, value) {
+  console.log(key, value);
+  let userExists;
+  Object.keys(userDB).forEach((entry) => {
+    console.log(entry);
+    console.log(userDB[entry][key]);
+    if (userDB[entry][key] === value) {
+      console.log('User exists!');
+      userExists = false 
+    } else {     
+      console.log("hopefully add user");
+      userExists = true; 
+    }
+  });
+  return userExists;
 }
 
 // URL index - list all shortened URLs
@@ -56,7 +73,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
-    urls: urlDatabase
+    urls: urlDatabase,
+    status: undefined,
+    registration: false,
+    userExists: undefined
   };
 
   res.render("registration", templateVars);
@@ -65,13 +85,32 @@ app.get("/register", (req, res) => {
 // Registration to userDB
 app.post("/register", (req, res) => {
   console.log(req.body);
-  let newUser = {
-    id: () => generateRandomString(),
-    email: req.body.email,
-    password: req.body.password
+  let templateVars = {
+    status: undefined,
+    registration: false,
+    userExists: undefined
   };
-
-  res.redirect("/register/");
+  let checkUserEmail = checkUserDB('email', req.body.email);
+  if (req.body.email === "" || req.body.password === "") {
+    res.redirect(400, "/register/"); 
+  } else if (checkUserEmail) {
+    let id = generateRandomString();
+    let newUser = {
+      id: id,
+      email: req.body.email,
+      password: req.body.password
+    };
+    userDB[newUser.id] = newUser;
+    console.log(userDB);
+    res.cookie('user_id', id);
+    templateVars.registration = true;
+    templateVars.status = 200;
+    res.redirect("/register/");
+  } else {
+    console.log("no user added");
+    templateVars.userExists = true;
+    res.redirect("/register/");
+  }
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
