@@ -1,4 +1,5 @@
 const express = require("express");
+const userDB = require("./db/user_db.js");
 const app = express();
 const PORT = 8080;
 
@@ -49,6 +50,28 @@ app.get("/urls/new", (req, res) => {
   };
 
   res.render("urls_new", templateVars);
+});
+
+// User registration
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
+
+  res.render("registration", templateVars);
+});
+
+// Registration to userDB
+app.post("/register", (req, res) => {
+  console.log(req.body);
+  let newUser = {
+    id: () => generateRandomString(),
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  res.redirect("/register/");
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
