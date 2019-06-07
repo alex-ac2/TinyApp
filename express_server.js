@@ -1,5 +1,6 @@
 const express = require("express");
 const userDB = require("./db/user_db.js").users;
+const urlDB = require("./db/url_db.js").urls;
 const app = express();
 const PORT = 8080;
 
@@ -11,15 +12,32 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+let urlDatabase = urlDB;
+
+// let urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
 
 // Generate and retun random string for URL key
 function generateRandomString() {
   let randomID = Math.random().toString(36).substr(3, 6);
   return randomID;
+}
+
+// Test Command
+// urlsForUser('1234');
+// Filter url_db matching user_id (returns filtered array)
+function urlsForUser(id) {
+  let filteredUrlObj = {};
+
+  for (entry in urlDatabase) {
+    if (urlDatabase[entry].userID === id) {
+      filteredUrlObj[entry] = { longURL: urlDatabase[entry].longURL };
+    }
+  }
+  console.log(filteredUrlObj);
+  return filteredUrlObj;
 }
 
 // Scan userDB for property value
@@ -52,16 +70,19 @@ function checkUserDB(key, value) {
   });
   return userExists;
 }
-// test broken
+
+
+
 // URL index - list all shortened URLs
 app.get("/urls", (req, res) => {
   let templateVars = { 
     user: null,
-    urls: urlDatabase
+    urls: null 
   };
-
+  
   if (req.cookies.user_id) {
     templateVars.user = userDB[req.cookies.user_id];
+    templateVars.urls = urlsForUser('1234');
   }
 
   res.render("urls_index", templateVars);
@@ -70,8 +91,9 @@ app.get("/urls", (req, res) => {
 // Save user inputed shortened URLs and redirect 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
+  let user_id = req.cookies["user_id"];
   let generatedID = generateRandomString();
-  urlDatabase[generatedID] = req.body.longURL;
+  urlDatabase[generatedID] = { longURL: req.body.longURL, userID: user_id };
   console.log(urlDatabase);
 
   res.redirect(301,"/urls/" + generatedID);
@@ -87,9 +109,12 @@ app.get("/urls/new", (req, res) => {
 
   if (req.cookies.user_id) {
     templateVars.user = userDB[req.cookies.user_id];
+    res.render("urls_new", templateVars);
+  } else {
+    res.render('login', templateVars);
   }
 
-  res.render("urls_new", templateVars);
+ 
 });
 
 // User registration
@@ -151,29 +176,33 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
-  console.log('body: ', req.body);
-  console.log('params: ', req.params);
   let id = req.params.shortURL;
-  urlDatabase[id] = req.body[id];
-  console.log("Update written");
-
+  urlDatabase[id].longURL = req.body[id];
+  console.log("Update written:");
+  console.log(urlDatabase);
+  
   res.redirect("/urls/");
 });
 
 // Redirect route from shortened URL to website
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]; 
+  const longURL = urlDatabase[req.params.shortURL].longURL; 
   console.log("Redirection occured.");
   res.redirect(longURL);
 });
 
 // Shortened URL display page
 app.get("/urls/:shortURL", (req, res) => {
-  console.log(req.params.shortURL);
   let templateVars = { 
-    username: req.cookies["user_id"],
-    shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] 
+    user: null,
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL].longURL 
   };
+  
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
+  }
+
   res.render("urls_show", templateVars);
 });
 
