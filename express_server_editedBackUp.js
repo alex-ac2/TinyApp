@@ -2,7 +2,6 @@ const express = require("express");
 const userDB = require("./db/user_db.js").users;
 const urlDB = require("./db/url_db.js").urls;
 const cryptStore = require("./crypt_store.js");
-var cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
@@ -91,9 +90,9 @@ app.get("/urls", (req, res) => {
     urls: null 
   };
   
-  if (req.session.user_id) {
-    templateVars.user = userDB[req.session.user_id];
-    templateVars.urls = urlsForUser(req.session.user_id);
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
+    templateVars.urls = urlsForUser(req.cookies.user_id);
   }
 
   res.render("urls_index", templateVars);
@@ -102,7 +101,7 @@ app.get("/urls", (req, res) => {
 // Save user inputed shortened URLs and redirect 
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
-  let user_id = req.session["user_id"];
+  let user_id = req.cookies["user_id"];
   let generatedID = generateRandomString();
   urlDatabase[generatedID] = { longURL: req.body.longURL, userID: user_id };
   console.log(urlDatabase);
@@ -113,14 +112,14 @@ app.post("/urls", (req, res) => {
 // Page to input to shortened URL
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
-    user_id: req.session["user_id"],
+    user_id: req.cookies["user_id"],
     urls: urlDatabase,
     user: null
   };
 
   // Check for logged in user (perhaps check for id in database)
-  if (req.session.user_id) {
-    templateVars.user = userDB[req.session.user_id];
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
     res.render("urls_new", templateVars);
   } else {
     res.render('login', templateVars);
@@ -132,7 +131,7 @@ app.get("/urls/new", (req, res) => {
 // User registration
 app.get("/register", (req, res) => {
   let templateVars = {
-    user_id: req.session["user_id"],
+    user_id: req.cookies["user_id"],
     user: null,
     urls: urlDatabase,
     status: undefined,
@@ -142,8 +141,8 @@ app.get("/register", (req, res) => {
     //userEmail: userDB[user_id].email
   };
 
-  if (req.session.user_id) {
-    templateVars.user = userDB[req.session.user_id];
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
   }
 
   res.render("registration", templateVars);
@@ -157,7 +156,9 @@ app.post("/register", (req, res) => {
     registration: false,
     userExists: undefined
   };
+
   let checkUserEmail = checkUserDB('email', req.body.email);
+  
   if (req.body.email === "" || req.body.password === "") {
     res.redirect(400, "/register/"); 
   } else if (checkUserEmail) {
@@ -172,7 +173,7 @@ app.post("/register", (req, res) => {
 
     userDB[newUser.id] = newUser;
     console.log(userDB);
-    req.session.user_id = id;
+    req.session.user_id = newUser.id;
     templateVars.registration = true;
     templateVars.status = 200;
     res.redirect("/urls/");
@@ -183,6 +184,37 @@ app.post("/register", (req, res) => {
     res.send("Email already taken");
   }
 });
+
+// app.post("/register", (req, res) => {
+//   if (!req.body.email || !req.body.password) {
+//     return res.redirect(400, "/register/");
+//     // res.locals
+//     // redirect
+//     // req.locals
+//   }
+
+//   if (!checkUserDB('email', req.body.email)) { // findUserByEmail/userExists
+//     return res.status(400).send("Email already taken");
+//   }
+  
+//   let newUser = {
+//     id: generateRandomString(),
+//     email: req.body.email,
+//     //password: cryptStore.hashPass(req.body.password)
+//     password: bcrypt.hashSync(req.body.password, 10)
+//   };
+
+//   let templateVars = {
+//     status: null,
+//     registration: true,
+//   };
+
+//   userDB[newUser.id] = newUser;
+//   console.log(userDB);
+//   
+//   res.redirect("/urls/");
+// });
+
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
@@ -214,8 +246,8 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL].longURL 
   };
   
-  if (req.session.user_id) {
-    templateVars.user = userDB[req.session.user_id];
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
   }
 
   res.render("urls_show", templateVars);
@@ -224,14 +256,14 @@ app.get("/urls/:shortURL", (req, res) => {
 // Login page route
 app.get("/login", (req, res) => {
   let templateVars = { 
-    user_id: req.session["user_id"],
+    user_id: req.cookies["user_id"],
     urls: urlDatabase,  
     userObject: userDB,
     user: null
   };
    
-  if (req.session.user_id) {
-    templateVars.user = userDB[req.session.user_id];
+  if (req.cookies.user_id) {
+    templateVars.user = userDB[req.cookies.user_id];
   }
 
   res.render("login", templateVars);
@@ -262,8 +294,7 @@ app.post("/login", (req, res) => {
   let user = getUserByEmailPassword(req.body.email, req.body.password);
 
   if(user) {
-    //res.cookie('user_id', user.id)
-    req.session.user_id = user.id;
+    res.cookie('user_id', user.id)
     res.redirect("/urls/");
   } else {
     res.status(400);
@@ -275,8 +306,7 @@ app.post("/login", (req, res) => {
 // LogOUT route
 app.post("/logout", (req, res) => {
   console.log("Logout user");
-  //res.clearCookie('user_id');
-  req.session = null;
+  res.clearCookie('user_id');
 
   res.redirect("/urls/");
 });

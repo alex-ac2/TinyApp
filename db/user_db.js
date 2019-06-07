@@ -10,7 +10,7 @@ module.exports = {
       email: "user2@example.com", 
       password: "dishwasher-funk"
     },
-    "1234": {
+    "123456": {
       id: "1234",
       email: "test@gmail.com",
       password: "telephone"
