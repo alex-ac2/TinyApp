@@ -36,7 +36,7 @@ function urlsForUser(id) {
       filteredUrlObj[entry] = { longURL: urlDatabase[entry].longURL };
     }
   }
-  console.log(filteredUrlObj);
+  // console.log(filteredUrlObj);
   return filteredUrlObj;
 }
 
@@ -90,7 +90,7 @@ app.get("/urls", (req, res) => {
 
 // Save user inputed shortened URLs and redirect 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);  // Log the POST request body to the console
   let user_id = req.cookies["user_id"];
   let generatedID = generateRandomString();
   urlDatabase[generatedID] = { longURL: req.body.longURL, userID: user_id };
