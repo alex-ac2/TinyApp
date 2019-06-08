@@ -8,13 +8,19 @@
   <!--   <input type="text" name="username" value="user name"><br> -->
   <!--   <input type="submit" value="Login"> -->
   <!-- </form> -->
-    <a href="/register">Resgister</a>  |  <a href="/login">Login</a> 
+    <a href="/register">Register</a>  |  <a href="/login">Login</a> 
   <% } else { %>
     <div>
+      <p>
+      <form method="GET" action="/urls/new">
+        <button style=width:250px type=“submit” class="btn btn-primary">Create TinyURL</button>
+      </form>
+      </p>
       <p>Logged in as <%= user.email %>!</p>
       <form method="POST" action="/logout"> 
         <button type="submit">Logout</button>
       </form>
     </div>
+    <br>
   <% }; %>
 </header>

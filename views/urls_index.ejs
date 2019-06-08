@@ -12,8 +12,10 @@
   <body style="font-size:20px; padding:50px;">
 
   <% include partials/_header %>
-
-  <h3>My URLS </h3>
+  <% if (urlOwnerRedirect) { %>
+    <p style="color:green;">* Please provide an address to your own shortened url</p>
+  <% }; %>
+  <h3>My URLS:</h3>
   <table style="width:50%">
     <!-- <tr>
       <th>URL</th>

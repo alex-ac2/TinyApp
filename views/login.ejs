@@ -13,7 +13,10 @@
   <body style="font-size:20px; padding:50px;">
 
     <% include partials/_header %>
-    <br>
+    <% if (loginRedirect) { %>
+      <p style="color:red;">* Please register or login to use TinyApp</p>
+    <% }; %>
+    
     <h3>Log into your account</h3>
 
     <form class="form-inline" action="/login" method="POST">

@@ -11,6 +11,10 @@ module.exports = {
         tjdrpl: {
             longURL: "https://yankees.com",
             userID: "123456"
+        },
+        triple: {
+            longURL: "http://example.com",
+            userID: "654321"
         }
     } 
 

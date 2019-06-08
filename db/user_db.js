@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 module.exports = {
   users: { 
     "userRandomID": {
@@ -11,9 +13,14 @@ module.exports = {
       password: "dishwasher-funk"
     },
     "123456": {
-      id: "1234",
+      id: "123456",
       email: "test@gmail.com",
-      password: "telephone"
+      password: bcrypt.hashSync("telephone", 10)
+    },
+    "654321": {
+      id: "654321",
+      email: "jake@gmail.com",
+      password: bcrypt.hashSync("dog", 10)
     }
   }
   

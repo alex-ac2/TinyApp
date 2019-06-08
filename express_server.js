@@ -82,13 +82,21 @@ function checkUserDB(key, value) {
   return userExists;
 }
 
-
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
+});
 
 // URL index - list all shortened URLs
 app.get("/urls", (req, res) => {
   let templateVars = { 
     user: null,
-    urls: null 
+    urls: null, 
+    loginRedirect: null,
+    urlOwnerRedirect: null
   };
   
   if (req.session.user_id) {
@@ -96,7 +104,15 @@ app.get("/urls", (req, res) => {
     templateVars.urls = urlsForUser(req.session.user_id);
   }
 
-  res.render("urls_index", templateVars);
+  // Check for logged in user (perhaps check for id in database)
+  if (req.session.user_id) {
+    templateVars.user = userDB[req.session.user_id];
+    res.render("urls_index", templateVars);
+  } else {
+    templateVars.loginRedirect = true;
+    res.render('login', templateVars);
+  }
+
 });
 
 // Save user inputed shortened URLs and redirect 
@@ -115,7 +131,8 @@ app.get("/urls/new", (req, res) => {
   let templateVars = { 
     user_id: req.session["user_id"],
     urls: urlDatabase,
-    user: null
+    user: null,
+    loginRedirect: null
   };
 
   // Check for logged in user (perhaps check for id in database)
@@ -123,6 +140,7 @@ app.get("/urls/new", (req, res) => {
     templateVars.user = userDB[req.session.user_id];
     res.render("urls_new", templateVars);
   } else {
+    templateVars.loginRedirect = true;
     res.render('login', templateVars);
   }
 
@@ -211,14 +229,32 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     user: null,
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL].longURL 
+    longURL: null, 
+    urlOwnerRedirect: null,
+    urls: null
   };
   
-  if (req.session.user_id) {
+  if (!urlDatabase.hasOwnProperty(req.params.shortURL)) {
+    console.log("wrong address")
+    res.send("URL does not exist!!");
+    
+  } else if (req.session.user_id && req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+    console.log('param_id: ', req.params.shortURL);
+    console.log('database_id: ', urlDatabase[req.params.shortURL].userID);
     templateVars.user = userDB[req.session.user_id];
+    templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
+    res.render("urls_show", templateVars);
+
+  } else if (req.session.user_id && req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
+    templateVars.urlOwnerRedirect = true;
+    templateVars.user = userDB[req.session.user_id];
+    templateVars.urls = urlsForUser(req.session.user_id);
+    res.render("urls_index", templateVars);
+  } else {
+    console.log("you can't see this address")
+    res.send("You can't see this address"); 
   }
 
-  res.render("urls_show", templateVars);
 });
 
 // Login page route
@@ -227,7 +263,8 @@ app.get("/login", (req, res) => {
     user_id: req.session["user_id"],
     urls: urlDatabase,  
     userObject: userDB,
-    user: null
+    user: null,
+    loginRedirect: false
   };
    
   if (req.session.user_id) {
@@ -278,7 +315,7 @@ app.post("/logout", (req, res) => {
   //res.clearCookie('user_id');
   req.session = null;
 
-  res.redirect("/urls/");
+  res.redirect("/login/");
 });
 
 // Test hello route
