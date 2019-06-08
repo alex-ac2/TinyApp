@@ -24,3 +24,7 @@ npm intall
 ```
 node express_server.js
 ```
+
+#### Known Bugs:
+
+1. On certain cases, user is able to register with previously registered email
