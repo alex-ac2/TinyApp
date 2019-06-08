@@ -31,11 +31,14 @@ node express_server.js
 
 ---
 ## Final Product
-
+URLs Page:
 !["Screenshot of URLs Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/urls_page.png?raw=true)
----
+
+Create Account Page:
 !["Screenshot of Register Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/register_page.png?raw=true)
----
+
+Login Redirect Error Page:
 !["Login Redirect Error Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/loginRedirect_errorPage.png?raw=true)
----
+
+URLs Redirect Error Page:
 !["URLs Redirect Error Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/urlsRedirect_errorPage.png?raw=true)
