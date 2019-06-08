@@ -28,3 +28,14 @@ node express_server.js
 #### Known Bugs:
 
 1. On certain cases, user is able to register with previously registered email
+
+---
+## Final Product
+
+!["Screenshot of URLs Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/urls_page.png?raw=true)
+---
+!["Screenshot of Register Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/register_page.png?raw=true)
+---
+!["Login Redirect Error Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/loginRedirect_errorPage.png?raw=true)
+---
+!["URLs Redirect Error Page"](https://github.com/alex-ac2/TinyApp/blob/master/docs/screenshots/urlsRedirect_errorPage.png?raw=true)
