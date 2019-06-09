@@ -62,22 +62,19 @@ function scanUserDB(property, value) {
   
 }
 
+// check whether user exists
 function checkUserDB(key, value) {
-  console.log(key, value);
-  let userExists;
+  console.log("check user: ", key, value);
+  let userExists = null;
 
   // To-do: edit to include cases(id, password, email)
-  Object.keys(userDB).forEach((entry) => {
-    // console.log(entry);
-    // console.log(userDB[entry][key]);
-    if (userDB[entry][key] === value) {
-      console.log('User exists!');
-      userExists = false 
-    } else {     
-      console.log("hopefully add user");
+  for (let element in userDB) {
+    console.log(userDB[element][key]);
+    if (userDB[element][key] === value) {
+      console.log("User exists!");
       userExists = true; 
     }
-  });
+  };
   return userExists;
 }
 
@@ -174,15 +171,16 @@ app.post("/register", (req, res) => {
     registration: false,
     userExists: undefined
   };
-  let checkUserEmail = checkUserDB('email', req.body.email);
+  let userExistsInDB = checkUserDB('email', req.body.email.toLowerCase().trim());
+
   if (req.body.email === "" || req.body.password === "") {
     res.redirect(400, "/register/"); 
-  } else if (checkUserEmail) {
+
+  } else if (!userExistsInDB) {
     let id = generateRandomString();
     let newUser = {
       id: id,
       email: req.body.email,
-      //password: cryptStore.hashPass(req.body.password)
       password: bcrypt.hashSync(req.body.password, 10)
         
     };
